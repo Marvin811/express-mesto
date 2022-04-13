@@ -1,25 +1,25 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const mongosee = require('mongoose');
 
-const { PORT = 3000 } = process.env;
+const PORT = process.env.PORT || 3000;
+
 const app = express();
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-  useUnifiedTopology: true,
-  autoIndex: true,
-});
+app.use('/', require('./routes/users'));
 
-app.get('/', function (req, res) {
-  res.send('Hello World !!!');
-});
+async function start() {
+  try {
+    await mongosee.connect('mongodb://localhost:27017/mestodb');
+    app.listen(PORT, () => {
+      // eslint-disable-next-line no-console
+      console.log('Server has been started...');
+    });
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.log(e);
+  }
+}
 
-app.post('/', function (req, res) {
-  res.send(req.body);
-});
-
-app.listen(PORT);
+start();
