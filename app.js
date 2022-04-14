@@ -1,25 +1,28 @@
+const path = require('path');
 const express = require('express');
-const mongosee = require('mongoose');
+const mongoose = require('mongoose');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const bodyParser = require('body-parser');
 
-const PORT = process.env.PORT || 3000;
-
+const { PORT = 3000 } = process.env;
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-app.use('/', require('./routes/users'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-async function start() {
-  try {
-    await mongosee.connect('mongodb://localhost:27017/mestodb');
-    app.listen(PORT, () => {
-      // eslint-disable-next-line no-console
-      console.log('Server has been started...');
-    });
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(e);
-  }
-}
+mongoose.connect('mongodb://localhost:27017/mestodb');
+app.use((req, res, next) => {
+  req.user = {
+    _id: '6258126030a5f4c1433895da', // вставьте сюда _id созданного в предыдущем пункте пользователя
+  };
 
-start();
+  next();
+});
+
+app.use('/users', require('./routes/users'));
+
+app.use(express.static(path.join(__dirname, 'public')));
+app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log('Ссылка на сервер');
+});
