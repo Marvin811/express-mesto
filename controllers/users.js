@@ -1,5 +1,6 @@
 const BadRequestError = require('../errors/badRequestError');
 const NotFoundError = require('../errors/notFoundError');
+const InternalServerError = require('../errors/internalServerError');
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res, next) => {
@@ -9,7 +10,7 @@ module.exports.getUsers = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некоректные данные.'));
       } else {
-        next(err);
+        next(new InternalServerError('Ошибка.'));
       }
     });
 };
@@ -28,7 +29,7 @@ module.exports.getIdUsers = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
       } else {
-        next(err);
+        next(new InternalServerError('Ошибка.'));
       }
     });
 };
@@ -42,7 +43,7 @@ module.exports.createUsers = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некоректные данные.'));
       } else {
-        next(err);
+        next(new InternalServerError('Ошибка.'));
       }
     });
 };
@@ -62,7 +63,7 @@ module.exports.updateUserInfo = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new NotFoundError('Пользователь с указанным _id не найден.'));
       } else {
-        next(err);
+        next(new InternalServerError('Ошибка.'));
       }
     });
 };
@@ -82,7 +83,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new NotFoundError('Пользователь с указанным _id не найден.'));
       } else {
-        next(err);
+        next(new InternalServerError('Ошибка.'));
       }
     });
 };
