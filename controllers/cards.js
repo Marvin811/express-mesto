@@ -4,7 +4,6 @@ const InternalServerError = require('../errors/internalServerError');
 const NotFoundError = require('../errors/notFoundError');
 const Card = require('../models/card');
 
-
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
@@ -24,7 +23,7 @@ module.exports.createCards = (req, res, next) => {
     });
 };
 
-module.exports.deleteCards = (req, res, next => {
+module.exports.deleteCards = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (card) {
@@ -40,10 +39,10 @@ module.exports.deleteCards = (req, res, next => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
       } else {
-        next(new InternalServerError('Ошибка.'))
+        next(new InternalServerError('Ошибка.'));
       }
-    })
-}
+    });
+};
 
 module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
@@ -60,12 +59,12 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(new BadRequestError('Переданы некорректные данные.'));
       } else {
-        next(new InternalServerError('Ошибка.'))
+        next(new InternalServerError('Ошибка.'));
       }
-    })
+    });
 };
 
-module.exports.dislikeCard = (req, res,) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } }, // убрать _id из массива
@@ -75,11 +74,11 @@ module.exports.dislikeCard = (req, res,) => {
       res.status(200).send(card);
     }
   })
-  .catch((err) => {
-    if (err.name === 'CastError') {
-      next(new BadRequestError('Переданы некорректные данные.'));
-    } else {
-      next(new InternalServerError('Ошибка.'))
-    }
-  })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные.'));
+      } else {
+        next(new InternalServerError('Ошибка.'));
+      }
+    });
 };
