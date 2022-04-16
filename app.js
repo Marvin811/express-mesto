@@ -1,4 +1,3 @@
-const path = require('path');
 const express = require('express');
 const mongoose = require('mongoose');
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -22,7 +21,9 @@ app.use((req, res, next) => {
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res) => {
+  res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
+});
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log('Ссылка на сервер');
