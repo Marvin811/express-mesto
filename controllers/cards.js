@@ -23,14 +23,14 @@ module.exports.createCards = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Не корректные данные' });
-        return;
+      } else {
+        res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
       }
-      res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
     });
 };
 
 module.exports.deleteCards = (req, res) => {
-  Card.findById(req.params.cardId)
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Карточка с таким id не найдена' });
