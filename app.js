@@ -23,8 +23,8 @@ app.use((req, res, next) => {
 
 app.use('/users', userRoutes);
 app.use('/cards', cardRoutes);
-app.use('/', (req, res) => {
-  res.status(404).send({ message: 'Ошибка: данный ресурс на найден.' });
+app.use((req, res) => {
+  res.status(404).send({ message: 'Ошибка: данный ресурс не найден.' });
 });
 
 app.listen(PORT, () => {

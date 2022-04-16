@@ -1,13 +1,15 @@
 const User = require('../models/user');
 
+const ERROR_NOT_FOUND = 404;
+const BAD_REQUEST = 400;
+const INTERNAL_SERVER_ERR = 500;
+
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => res.status(200).send({ data: users }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некоректные данные' });
-      } else if (err.statusCode === 400) {
-        res.status(404).send({ message: err.message });
+        res.status(BAD_REQUEST).send({ message: 'Нет таких пользователей' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
@@ -15,17 +17,18 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getIdUsers = (req, res) => {
-  User.findById(req.params.id)
-    .then((users) => {
-      if (users) {
-        res.status(200)
-          .send(users);
+  User.findById(req.params._id)
+    .then((user) => {
+      if (!user) {
+        res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' });
       }
+      res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Нет пользователя с таким id' });
       }
+      res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -36,8 +39,9 @@ module.exports.createUsers = (req, res) => {
     .then((users) => res.status(200).send({ users }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
       }
+      res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -59,8 +63,13 @@ module.exports.updateUserInfo = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
+        return;
       }
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'передан некорректный id' });
+      }
+      res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
     });
 };
 
@@ -82,7 +91,12 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректные данные' });
+        res.status(BAD_REQUEST).send({ message: 'Некорректные данные' });
+        return;
       }
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'передан некорректный id' });
+      }
+      res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
     });
 };
