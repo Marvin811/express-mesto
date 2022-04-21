@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const ERROR_NOT_FOUND = 404;
@@ -100,4 +101,14 @@ module.exports.updateAvatar = (req, res) => {
       }
       res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
     });
+};
+
+module.exports.createUser = (req, res) => {
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      email: req.body.email,
+      password: hash,
+    }))
+    .then((user) => res.send(user))
+    .catch((err) => res.status(400).send(err));
 };
