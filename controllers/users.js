@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const ERROR_NOT_FOUND = 404;
@@ -110,5 +111,19 @@ module.exports.createUser = (req, res) => {
       password: hash,
     }))
     .then((user) => res.send(user))
-    .catch((err) => res.status(400).send(err));
+    .catch((err) => res.status(BAD_REQUEST).send(err));
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      res.send({
+        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
+      });
+    })
+    .catch((err) => {
+      res.status(401).send({ message: err.message });
+    });
 };
