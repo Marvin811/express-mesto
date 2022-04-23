@@ -1,3 +1,4 @@
+const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
@@ -35,10 +36,10 @@ module.exports.getIdUsers = (req, res) => {
     });
 };
 
-module.exports.createUsers = (req, res) => {
-  const { name, about, avatar } = req.body;
+module.exports.getCurrentUser = (req, res) => {
+  const { _id } = req.user;
 
-  User.create({ name, about, avatar })
+  User.findById(_id)
     .then((users) => res.status(200).send({ users }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -119,9 +120,17 @@ module.exports.login = (req, res) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      res.send({
-        token: jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' }),
-      });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
+      res
+        .cookie('token', token, {
+          maxAge: 3600000 * 24 * 7,
+          // httpOnly: true,
+        })
+        .send({ token });
     })
     .catch((err) => {
       res.status(401).send({ message: err.message });
