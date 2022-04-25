@@ -84,7 +84,7 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getIdUsers = (req, res) => {
-  User.findById(req.params.id)
+  User.findById(req.params._id)
     .then((user) => {
       if (!user) {
         res.status(ERROR_NOT_FOUND).send({ message: 'Пользователь с указанным _id не найден' });
@@ -94,9 +94,8 @@ module.exports.getIdUsers = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Нет пользователя с таким id' });
-      } else {
-        res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
       }
+      res.status(INTERNAL_SERVER_ERR).send({ message: 'Что-то пошло не так' });
     });
 };
 
